@@ -2,9 +2,6 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
-import tgbannerImage from "../../assets/image/tgbanner.png";
-import contactsImage from "../../assets/image/contacts.png";
-import Ctrs from "../../assets/image/ctrs.png";
 
 import {
   selectPhones,
@@ -33,7 +30,7 @@ export default function Footer() {
             </Link>
           </div>
           <div className="footer__bg">
-            <img src={tgbannerImage} alt="" />
+            <img src="#" alt="" />
           </div>
         </div>
       </div>
@@ -43,13 +40,13 @@ export default function Footer() {
             <h1>{siteName}</h1>
             <span>© {date} Все права защищены</span>
             <div className="footer__images">
-              <img src={Ctrs} alt="" />
+              <img src="#"alt="" />
             </div>
           </div>
           <div className="footer__container">
             <h2>Соцсети</h2>
             <div className="footer__images">
-              <img src={contactsImage} alt="" />
+              <img src="#" alt="" />
             </div>
           </div>
           <div className="footer__container">
