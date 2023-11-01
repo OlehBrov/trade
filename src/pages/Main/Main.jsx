@@ -14,8 +14,7 @@ export default function Main() {
           <SideBar />
           <HeroSlider />
         </HeroSection>
-      </Container>
-      <Container>
+   
         <NewProducts />
       </Container>
     </>

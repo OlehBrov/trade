@@ -50,6 +50,7 @@ import {
   SearchEnhancedForm,
 } from "./HeaderSearchForm/HeaderSearchForm";
 import { selectAuthIsLoggedIn } from "../../redux/authSlice/authSelector";
+import { CartLink } from "../CartLink/CartLink";
 const phonesNums = [
   { value: "+380445017474", label: "+38 (044) 501 74 74" },
   { value: "+380445017171", label: "+38 (044) 501 71 71" },
@@ -212,9 +213,7 @@ export default function Header() {
                   </Link>
                 </li>
                 <li>
-                  <Link to={"/cart"}>
-                    <RiShoppingCart2Line />
-                  </Link>
+                  <CartLink/>
                 </li>
               </UserLinksList>
             </UserLinksWrap>

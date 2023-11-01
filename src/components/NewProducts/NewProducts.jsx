@@ -5,6 +5,7 @@ import {
   NewProductsGalleryWrap,
   NewProductsSideBar,
   NewProductsWrapper,
+  ProductName,
   ProductsList,
 } from "./NewProductsStyled";
 import { useGetAllProductsQuery } from "../../redux/API/catalogeAPI";
@@ -13,194 +14,105 @@ import gsap, { wrap } from "gsap";
 import { TransitionGroup } from "react-transition-group";
 import { Transition } from "react-transition-group";
 import { ProductCard } from "./ProductCard";
+import { verticalLoop } from "../../services/verticalLoop";
+import { RatingStars } from "../RatingStars/RatingStars";
+import {
+  CatalogFLink,
+  SectionDescription,
+  SectionHeader,
+} from "../../assets/styles/commonElements";
+import { Link } from "react-router-dom";
 // import { ProductCard } from "./ProductCard";
 
 export const NewProducts = () => {
   const { data, status } = useGetAllProductsQuery();
-  const [productsRefsList, setProductsRefsList] = useState([]);
-  const [currentPosition, setCurrentPosition] = useState(0);
+
+  const [productCardsNodes, setProductCardsNodes] = useState([]);
   const [maxGalleryPosition, setMaxGalleryPosition] = useState(0);
-  const [productCards, setProductCards] = useState([]);
+
+  const [stepIncrement, setStepImcrement] = useState(0);
   const productsListRef = useRef();
   const nodeRef = useRef();
 
-  console.log("DATA", data);
+  const prodScrollPosition = {
+    position: 0,
+  };
+
   useEffect(() => {
-    if (data) {
-      console.log("first useEffect");
-      setMaxGalleryPosition(data.length);
-    
-    }
-  }, [data]);
+    status === "fulfilled" && data && setMaxGalleryPosition(data.length);
+    data && console.log("datda", data);
+    data && setProductCardsNodes(gsap.utils.toArray(".box"));
+  }, [data, status]);
 
-  // const showProducts = (position, direction = "up", count = 2) => {
-  //   if (position + count > maxGalleryPosition)
-  //     return console.log("End of list");
+  useLayoutEffect(() => {
+    let ctx = gsap.context(() => {
+      // Our animations can use selector text like ".box"
+      // this will only select '.box' elements that are children of the component
 
-  //   const end = direction === "up" ? position + count : position - count;
+      productCardsNodes &&
+        gsap.set(productCardsNodes, {
+          y: (i, el) => {
+            if (i % 2 === 0) return 0;
+            else return 30;
+          },
 
-  //   // const visibleProducts = productsRefsList.slice(position, end);
+          x: 0,
+        });
+      setStepImcrement(gsap.getProperty(".box", "height") + 30);
+    }, productsListRef); // <- IMPORTANT! Scopes selector text
+    return () => {
+      ctx.revert();
+    }; // animation cleanup!!
+  }, [productCardsNodes]);
 
-  //   setProductCards(() => {
-  //     return data.slice(position, end);
-  //   });
-
-  //   setCurrentPosition(position);
-  //   console.log("productCards", productCards);
-  // };
-  // useEffect(() => {
-  //   productsListRef.length && showProducts(0, "up", 4);
-  // }, [productsListRef]);
-  // useEffect(() => {
-  //   if (!boxes || !boxes.length) setBoxes(document.querySelectorAll(".box"));
-  // }, [boxes]);
-  // useLayoutEffect(() => {
-  //   console.log("boxes", boxes);
-  //   boxes &&
-  //     gsap.set(boxes, {
-  //       yPercent: (i, el) => {
-  //         // console.log("el in yPercent", el);
-  //         if (i === 0) {
-  //           return -50;
-  //         } else if (i === 1) {
-  //           return 50;
-  //         } else return 100;
-  //       },
-  //       opacity: (i, el) => {
-  //         if (i < 2) {
-  //           return 1;
-  //         } else return 0;
-  //       },
-  //       onComplete: () => console.log("gsap set complete"),
-  //     });
-  // }, [boxes]);
-
-  // useLayoutEffect(() => {
-  //   console.log('productsListRef', productsListRef)
-  //   let ctx = gsap.context(() => {
-  //     // Our animations can use selector text like ".box"
-  //     // this will only select '.box' elements that are children of the component
-  //     gsap.set('.box', {
-  //       yPercent: (i, el) => {
-  //         console.log('el in yPercent', el)
-  //         if (i === 0) {
-  //           return 0;
-  //         } else if (i === 1) {
-  //           return 50;
-  //         } else return 100;
-  //       },
-  //       opacity: (i, el) => {
-  //         if (i < 2) {
-  //           return 1;
-  //         } else return 0;
-  //       },
-  //       onComplete: () => console.log("gsap set complete"),
-  //     });
-  //   }, productsListRef); // <- IMPORTANT! Scopes selector text
-  //   return () => {
-  //     ctx.revert()
-  //   }; // animation cleanup!!
-  // }, []);
-
-  // useEffect(() => {
-  //   let arr = gsap.utils.toArray(".galleryItem");
-  //   setListItemsArr(arr);
-  //   console.log("productsListRef", productsListRef);
-  //   console.log("arr", arr);
-  // }, []);
-
-  //Make elRefs
-  // useEffect(() => {
-  //   if (products) {
-  //     let arrLength = markupGallery.length;
-  //     // add or remove refs
-  //     setElRefs((elRefs) =>
-  //       Array(arrLength)
-  //         .fill()
-  //         .map((_, i) => elRefs[i] || createRef())
-  //     );
-  //   }
-  // }, [products]);
-
-  //Set Gallery height
-
-  // const prodArray = gsap.utils.toArray(".galleryItem");
-
-  const productsTl = gsap.timeline({
-    paused: true,
-    onComplete: () => {
-      // updateSlicePositions();
+  const scrollProducts = gsap.to(productCardsNodes, {
+    y: (i) => {
+      if (i % 2 === 0) {
+        return prodScrollPosition.position;
+      } else return prodScrollPosition.position + 30;
     },
+    paused: true,
   });
 
-  //Timeline
-  // useLayoutEffect(() => {
-  //   productsTl
-  //     .to(visibleProd, {
-  //       scale: 0.6,
-  //       yPercent: -110,
-  //       duration: 0.2,
-  //       ease: "ease",
-  //       opacity: 0,
-  //       onComplete: () => console.log("visibleProd to", visibleProd),
-  //     })
-  //     .to(
-  //       bottomProd,
-  //       {
-  //         yPercent: -110,
-  //         duration: 0.2,
-  //         ease: "ease",
-  //         onComplete: () => console.log("bottomProd to", bottomProd),
-  //       },
-  //       "<"
-  //     )
-  //     .to(underBottomProd, {
-  //       yPercent: -110,
-  //       duration: 0.2,
-  //       ease: "ease",
-  //       opacity: 1,
-  //       xPercent: gsap.utils.wrap([0, 110]),
-  //     });
-  // });
-  // const appear = () => {
-  //   ref.current &&
-  //     gsap.set(ref.current, {
-  //       opacity: 0.7,
-  //     });
-  // };
   const handleUp = () => {
-    // productsTl.play();
-    // showProducts(currentPosition + 2, "up", 4);
+    prodScrollPosition.position = prodScrollPosition.position - stepIncrement;
+    scrollProducts.invalidate();
+    scrollProducts.restart();
   };
   const handleDown = () => {
-    // productsTl.reverse();
-    //  showProducts(currentPosition - 2, "down", 4);
+    prodScrollPosition.position = prodScrollPosition.position + stepIncrement;
+    scrollProducts.invalidate();
+    scrollProducts.restart();
   };
 
   return (
     <NewProductsWrapper>
       <NewProductsSideBar>
-        <p>Новинки</p>
+        <SectionHeader>Новинки</SectionHeader>
+        <SectionDescription>
+          Самые свежые и сочные новинки, которые не оставять ни одного сомнения
+          в их покупке !
+        </SectionDescription>
+        <CatalogFLink  to={"#"}>В каталог</CatalogFLink>
       </NewProductsSideBar>
       <NewProductsGalleryWrap>
         <ProductsList ref={productsListRef}>
-          {/* <TransitionGroup component={null}> */}
-            {data &&
-              data.map((product) => (
-                // <ProductCard key={product.id} product={product} />
-                
-                  <li className="box" key={product.id}>
-                    <Card>
-                      <img src={defProdImg} alt="" />
-                      <p>
-                        {product.name_ua}, number {product.id}
-                      </p>
-                      <span>{product.id.stock_status}</span>
-                    </Card>
-                  </li>
+          {/* <TransitionGroup c  omponent={null}> */}
+          {data &&
+            data.map((product) => (
+              <ProductCard key={product.id} product={product} />
 
-
-              ))}
+              // <li className="box" key={product.id}>
+              //   <Card>
+              //     <img src={`https://img.comtrading.ua/image/${product.image}`} alt="" />
+              //     <RatingStars ratingChanged={ratingChanged } />
+              //     <ProductName>
+              //       {product.name_ua}
+              //     </ProductName>
+              //     <span>{product.id.stock_status}</span>
+              //   </Card>
+              // </li>
+            ))}
           {/* </TransitionGroup> */}
         </ProductsList>{" "}
         <button type="button" onClick={handleUp}>
